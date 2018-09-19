@@ -31,7 +31,7 @@ CSS 标准为我们提供了 3 种布局方式：标准文档流、浮动布局�
 
 项目默认沿主轴排列。单个项目占据的主轴空间叫做main size，占据的交叉轴空间叫做cross size。
 
-![](CSS3-Flexbox-Model.jpg)
+![](https://github.com/JerryChan31/Blog/blob/master/asset/CSS3-Flexbox-Model.jpg)
 
 ## Flex 布局使用的属性
 
