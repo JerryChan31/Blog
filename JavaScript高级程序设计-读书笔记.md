@@ -994,4 +994,20 @@ Undefined|n/a|undefined|
 
  - AJAX：通过XMLHttpRequest（XHR）对象以异步方式与服务器进行通信，意味着无需刷新页面即可取得新数据。
 
+ - IE7+、Firefox、Opera、Chrome和Safari都支持原生的XHR对象，在这些浏览器中创建XHR对象要像下面这样使用XMLHttpRequest构造函数。
+
+        var xhr = new XMLHttpRequest();
+
+### 21.1.1 XHR的用法
+ - 在使用XHR对象时，要调用的第一个方法是open()，它接受3个参数：要发送的请求的类型（"get"、"post"等）、请求的URL（相对路径或绝对路径）和表示是否异步发送请求的布尔值。
+
+        xhr.open("get", "example.php", false);
+
+ - 只能向同一个域中使用相同端口和协议的URL发送请求。如果URL与启动请求的页面有任何差别，都会引发安全错误。需使用CORS。
+
+        xhr. open("get", "example.txt", false);
+        xhr.send(null);
+
+ - 这里的send()方法接收一个参数，即要作为请求主体（body）发送的数据。如果不需要通过请求主体发送数据，则必须传入null，因为这个参数对有些浏览器来说是必需的。调用send()之后，请求就会被分派到服务器。
+
  
