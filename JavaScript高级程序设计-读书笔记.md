@@ -911,3 +911,87 @@ Undefined|n/a|undefined|
 
 ## 第18章 JavaScript与XML
 
+## 第20章 JSON
+
+### 20.1 语法
+
+ - 关于JSON，最重要的是要理解它是一种数据格式，不是一种编程语言。虽然具有相同的语法形式，但JSON并不从属于JavaScript。而且，并不是只有JavaScript才使用JSON，毕竟JSON只是一种数据格式。很多编程语言都有针对JSON的解析器和序列化器。
+
+ - JSON的语法可以表示以下三种类型的值。
+     - 简单值：使用与JavaScript相同的语法，可以在JSON中表示字符串、数值、布尔值和null。但JSON不支持JavaScript中的特殊值undefined。
+     - 对象：对象作为一种复杂数据类型，表示的是一组有序的键值对儿。而每个键值对儿中的值可以是简单值，也可以是复杂数据类型的值。
+     - 数组：数组也是一种复杂数据类型，表示一组有序的值的列表，可以通过数值索引来访问其中的值。数组的值也可以是任意类型——简单值、对象或数组。
+
+ - JSON不支持变量、函数或对象实例，它就是一种表示结构化数据的格式，虽然与JavaScript中表示数据的某些语法相同，但它并不局限于JavaScript的范畴。
+
+        一个JSON对象的示例：
+        { 
+            "name": "Nicholas", 
+            "age": 29 
+        }
+
+ - 与JavaScript不同，JSON中对象的属性名任何时候都必须加双引号。手工编写JSON时，忘了给对象属性名加双引号或者把双引号写成单引号都是常见的错误。
+
+ - JSON数组使用`[]`表示。
+
+### 20.2 解析与序列化
+
+ - JSON对象有两个方法：`stringify()`和`parse()`。在最简单的情况下，这两个方法分别用于把JavaScript对象序列化为JSON字符串和把JSON字符串解析为原生JavaScript值。
+ - 默认情况下，`JSON.stringify()`输出的JSON字符串不包含任何空格字符或缩进。 
+ - 在序列化JavaScript对象时，所有函数及原型成员都会被有意忽略，不体现在结果中。此外，值为undefined的任何属性也都会被跳过。结果中最终都是值为有效JSON数据类型的实例属性。
+
+#### 20.2.2 序列化选项
+
+ - `JSON.stringify()`除了要序列化的JavaScript对象外，还可以接收另外两个参数，这两个参数用于指定以不同的方式序列化JavaScript对象。第一个参数是个过滤器，可以是一个数组，也可以是一个函数；第二个参数是一个选项，表示是否在JSON字符串中保留缩进。单独或组合使用这两个参数，可以更全面深入地控制JSON的序列化。
+
+ - 如果过滤器参数是数组，那么`JSON.stringify()`的结果中将只包含数组中列出的属性。
+ - 如果第二个参数是函数，行为会稍有不同。传入的函数接收两个参数，属性（键）名和属性值。根据属性（键）名可以知道应该如何处理要序列化的对象中的属性。属性名只能是字符串，而在值并非键值对儿结构的值时，键名可以是空字符串。为了改变序列化对象的结果，函数返回的值就是相应键的值。不过要注意，如果函数返回了undefined，那么相应的属性会被忽略。
+ - `JSON.stringify()`方法的第三个参数用于控制结果中的缩进和空白符。如果这个参数是一个数值，那它表示的是每个级别缩进的空格数。最大缩进空格数为10，所有大于10的值都会自动转换为10。只要传入有效的控制缩进的参数值，结果字符串就会包含换行符。 例如，要在每个级别缩进4个空格，可以这样写代码：
+
+        var jsonText = JSON.stringify(book, null, 4);
+
+        // 得到结果如下
+        { 
+            "title": "Professional JavaScript", 
+            "authors": [ "Nicholas C. Zakas" ], 
+            "edition": 3, 
+            "year": 2011 
+        }
+
+ - 如果缩进参数是一个字符串而非数值，则这个字符串将在JSON字符串中被用作缩进字符（不再使用空格）。在使用字符串的情况下，可以将缩进字符设置为制表符，或者两个短划线之类的任意字符。
+
+ - `toJSON()`可以作为函数过滤器的补充，因此理解序列化的内部顺序十分重要。假设把一个对象传入`JSON.stringify()`，序列化该对象的顺序如下。
+     1. 如果存在`toJSON()`方法而且能通过它取得有效的值，则调用该方法。否则，按默认顺序执行序列化。
+     2. 如果提供了第二个参数，应用这个函数过滤器。传入函数过滤器的值是第1步返回的值。
+     3. 对第2步返回的每个值进行相应的序列化。
+     4. 如果提供了第三个参数，执行相应的格式化。
+
+ - 无论是考虑定义`toJSON()`方法，还是考虑使用函数过滤器，亦或需要同时使用两者，理解这个顺序都是至关重要的。
+
+### 20.2.3 解析选项
+
+ - JSON.parse()方法也可以接收另一个参数，该参数是一个函数，将在每个键值对儿上调用。在将日期字符串转换为Date对象时，经常要用到还原函数。例如：
+
+        var book = { 
+            "title": "Professional JavaScript", 
+            "authors": [ "Nicholas C. Zakas" ], 
+            edition: 3, 
+            year: 2011, 
+            releaseDate: new Date( 2011, 11, 1) 
+        }; 
+        var jsonText = JSON. stringify(book);
+        var bookCopy = JSON. parse(jsonText, function(key, value){ 
+            if (key == "releaseDate"){ 
+                return new Date( value); 
+            } else { 
+                return value;
+            } 
+        });
+        alert(bookCopy.releaseDate.getFullYear());
+        // bookCopy.releaseDate被解析为Date类型的对象，因此能够调用getFullYear()方法
+
+## 第21章 AJAX和Comet
+
+ - AJAX：通过XMLHttpRequest（XHR）对象以异步方式与服务器进行通信，意味着无需刷新页面即可取得新数据。
+
+ 
