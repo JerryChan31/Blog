@@ -80,6 +80,23 @@
       - [17.2.1 try-catch语句](#1721-try-catch%E8%AF%AD%E5%8F%A5)
       - [17.2.2 抛出错误](#1722-%E6%8A%9B%E5%87%BA%E9%94%99%E8%AF%AF)
   - [第18章 JavaScript与XML](#%E7%AC%AC18%E7%AB%A0-javascript%E4%B8%8Exml)
+  - [第20章 JSON](#%E7%AC%AC20%E7%AB%A0-json)
+    - [20.1 语法](#201-%E8%AF%AD%E6%B3%95)
+    - [20.2 解析与序列化](#202-%E8%A7%A3%E6%9E%90%E4%B8%8E%E5%BA%8F%E5%88%97%E5%8C%96)
+      - [20.2.2 序列化选项](#2022-%E5%BA%8F%E5%88%97%E5%8C%96%E9%80%89%E9%A1%B9)
+    - [20.2.3 解析选项](#2023-%E8%A7%A3%E6%9E%90%E9%80%89%E9%A1%B9)
+  - [第21章 AJAX和Comet](#%E7%AC%AC21%E7%AB%A0-ajax%E5%92%8Ccomet)
+      - [21.1.1 XHR的用法](#2111-xhr%E7%9A%84%E7%94%A8%E6%B3%95)
+      - [21.1.3 GET请求](#2113-get%E8%AF%B7%E6%B1%82)
+      - [21.1.4 POST请求](#2114-post%E8%AF%B7%E6%B1%82)
+    - [21.2 XMLHTTPRequest 2级](#212-xmlhttprequest-2%E7%BA%A7)
+      - [21.2.1 FormData](#2121-formdata)
+      - [21.2.3 overrideMimeType() 方法](#2123-overridemimetype-%E6%96%B9%E6%B3%95)
+    - [21.3 进度事件](#213-%E8%BF%9B%E5%BA%A6%E4%BA%8B%E4%BB%B6)
+      - [21.3.1 load事件](#2131-load%E4%BA%8B%E4%BB%B6)
+      - [21.3.2 progress事件](#2132-progress%E4%BA%8B%E4%BB%B6)
+    - [21.4 跨域资源共享](#214-%E8%B7%A8%E5%9F%9F%E8%B5%84%E6%BA%90%E5%85%B1%E4%BA%AB)
+    - [21.5 其他跨域技术](#215-%E5%85%B6%E4%BB%96%E8%B7%A8%E5%9F%9F%E6%8A%80%E6%9C%AF)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -994,12 +1011,15 @@ Undefined|n/a|undefined|
 
  - AJAX：通过XMLHttpRequest（XHR）对象以异步方式与服务器进行通信，意味着无需刷新页面即可取得新数据。
 
+ - 实践中使用jQuery的ajax函数较多，此笔记为了解背后的机制。
+
  - IE7+、Firefox、Opera、Chrome和Safari都支持原生的XHR对象，在这些浏览器中创建XHR对象要像下面这样使用XMLHttpRequest构造函数。
 
         var xhr = new XMLHttpRequest();
+### XMLHTTPRequest对象
 
-### 21.1.1 XHR的用法
- - 在使用XHR对象时，要调用的第一个方法是open()，它接受3个参数：要发送的请求的类型（"get"、"post"等）、请求的URL（相对路径或绝对路径）和表示是否异步发送请求的布尔值。
+#### 21.1.1 XHR的用法
+ - 在使用XHR对象时，要调用的第一个方法是`open()`，它接受3个参数：要发送的请求的类型（"get"、"post"等）、请求的URL（相对路径或绝对路径）和表示是否异步发送请求的布尔值。
 
         xhr.open("get", "example.php", false);
 
@@ -1008,6 +1028,65 @@ Undefined|n/a|undefined|
         xhr. open("get", "example.txt", false);
         xhr.send(null);
 
- - 这里的send()方法接收一个参数，即要作为请求主体（body）发送的数据。如果不需要通过请求主体发送数据，则必须传入null，因为这个参数对有些浏览器来说是必需的。调用send()之后，请求就会被分派到服务器。
+ - 这里的`send()`方法接收一个参数，即要作为请求主体（body）发送的数据。如果不需要通过请求主体发送数据，则必须传入null，因为这个参数对有些浏览器来说是必需的。调用`send()`之后，请求就会被分派到服务器。
 
- 
+ - 异步发送请求时，可以通过readestatechange事件来监听readyState属性的变化，从而确认是否收到响应。当readyState为4的时候，说明已经接收到全部响应数据，而且已经可以在客户端使用了。
+
+ - 在收到响应后，响应的数据会自动填充XHR对象的属性，相关的属性简介如下。
+     - responseText：作为响应主体被返回的文本。
+     - responseXML：如果响应的内容类型是"text/xml"或"application/xml"，这个属性中将保存包含着响应数据的XMLDOM文档。
+     - status：响应的HTTP状态。收到响应后第一步应该检查status。
+     - statusText：HTTP状态的说明。
+
+ - 默认情况下，XHR还会发送相关的头部信息。要自定义头部信息，在`open()`之后，`send()`之前使用`SetRequestHeader()`方法。
+ - 获取响应头部信息，使用`getResponseHeader()`。
+
+#### 21.1.3 GET请求
+ - 传入`open()`函数的URL必须使用`encodeURIComponent()`进行编码。
+ - 下面是一个添加参数的辅助函数示例：
+
+        function addURLParam(url, name, value) { 
+            url += (url.indexOf("?") == -1 ? "?" : "&"); 
+            url += encodeURIComponent(name) + "=" + encodeURIComponent(value); 
+            return url; 
+        }
+
+#### 21.1.4 POST请求
+
+ - 如要使用XHR模仿表单提交，需要将Content-type头部信息设置为`application/x-www-form-urlencoded`。
+ - POST数据的格式与querystring相同。
+
+### 21.2 XMLHTTPRequest 2级
+
+#### 21.2.1 FormData
+
+ - 由于表单序列化非常常用，XMLHTTPRequest2级定义了FormData类型，为序列化提供了便利。其用法一目了然。
+
+        var data = new FormData(); 
+        data.append("name", "Nicholas");
+
+ - 创建后的FormData实例可以直接传给XHR的send()方法。
+
+#### 21.2.3 overrideMimeType() 方法
+
+ - `overrideMimeType()`方法可以重写响应的MIME类型，从而更加恰当地处理响应。
+
+### 21.3 进度事件
+
+#### 21.3.1 load事件
+
+ - 与onReadyStateChange监听器类似，监听是否完成加载。
+
+#### 21.3.2 progress事件
+ - 这个事件会在浏览器接收新数据期间周期性地触发。而onprogress事件处理程序会接收到一个event对象，其target属性是XHR对象，但包含着三个额外的属性：lengthComputable、position和totalSize。其中，lengthComputable是一个表示进度信息是否可用的布尔值，position表示已经接收的字节数，totalSize表示根据Content-Length响应头部确定的预期字节数。有了这些信息，我们就可以为用户创建一个进度指示器了。
+
+### 21.4 跨域资源共享
+
+ - Firefox3.5+、Safari4+、Chrome、iOS版Safari和Android平台中的WebKit都通过XMLHttpRequest对象实现了对CORS的原生支持。在尝试打开不同来源的资源时，无需额外编写代码就可以触发这个行为。要请求位于另一个域中的资源，使用标准的XHR对象并在open()方法中传入绝对URL即可。IE浏览器需要使用XDR对象，需要时查询。
+ - 跨浏览器支持：检测XHR是否支持CORS的最简单方式，就是检查是否存在withCredentials属性。再结合检测XDomainRequest对象是否存在，就可以兼顾所有浏览器了。
+
+### 21.5 其他跨域技术
+
+ - 图像Ping：使用`<img>`标签，实现浏览器到服务器的单向通信。
+ - JSONP：使用`<script>`标签请求加载一个脚本，服务器返回JS函数调用形式的数据。更多请看[说说JSON和JSONP](https://www.cnblogs.com/dowinning/archive/2012/04/19/json-jsonp-jquery.html)。
+ - Comet：Ajax是一种从页面向服务器请求数据的技术，而Comet则是一种服务器向页面推送数据的技术。
