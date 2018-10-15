@@ -128,3 +128,16 @@
 **Step 3: Media queries**
  Fluid layout that is triggered by certain sizes.
  ORDERING your rules: default rule always on the top.
+
+
+ ## Week 3: Framework
+
+### Bootstrap 3.0 benefits
+ - 12-column grid system
+     - helps with spacing issues
+     - built-in responsive design
+ - Common jQery functionalities
+     - Accordion, Dorp-down menus, Carousel
+ - Familiar "look and feel"
+     - Many sites use Bootstrap
+     - Makes your forms look "legitimate"
