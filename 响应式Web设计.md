@@ -136,8 +136,59 @@
  - 12-column grid system
      - helps with spacing issues
      - built-in responsive design
- - Common jQery functionalities
+ - Common jQuery functionalities
      - Accordion, Dorp-down menus, Carousel
  - Familiar "look and feel"
      - Many sites use Bootstrap
      - Makes your forms look "legitimate"
+
+### Bootstrap Breakpoints
+ - Bootstrap hardcodes the breakpoints for different views.
+     - 部分浏览器不支持小于 300px 的 breakpoint，Bootstrap 支持最小的断点为 320px;
+     - xs-: minimum width 480px (For most phone)
+     - sm-: minimum width 768px (Small device and tablets, and smaller window size browser)
+     - md-: minimum width 992px (Beyond most of phone and tablet)
+     - lg-: minimum width 1200px
+ - It it possible to change default value, modify on your need. 默认值可修改，根据需求来
+ - 不需要知道具体的像素值，只需记住字母对应的含义即可。
+
+### Bootstrap Layout System
+ - Bootstrap layout is based on 12-column grid.
+     - 3 column = 25%
+     - 6 column = 50%
+     - ...
+ - Every grid consists of:
+     - A container
+         - A row
+             - One or more column classes
+```
+<div class="container">
+    <div class="row">
+        <div class="col-xx-yy">
+
+<!-- xx: viewport size: xs, sm, md, lg -->
+<!-- yy: number of columns: 0..12 -->
+<!-- These are often combined: -->
+
+<img src="pic.jpg" class="col-xs-12 col-sm-6 col-md-3 col-lg-2">
+```
+如果元素是块级元素，无需指定 12 column 的属性。
+```
+<div class=“col-xs-12 col-md-3”>Yellow Part</div>
+```
+等价于：
+```
+<div class=“col-md-3”>Yellow Part</div>
+```
+
+**Positioning classes**
+ - On viewports md and up, there is an option for push and pull class.
+    - `col-XX-push-YY` =>  move YY columns to the
+right
+    - `col-XX-pull-YY` =>  move YY columns to the
+left
+
+**Responsive utility classes**
+ - `hidden-XX` content will only be hidden on the XX screen size
+ - `visible-XX` content will only be visible on the XX screen size
+ - `sr-only` content is hidden on all devices except screen readers
