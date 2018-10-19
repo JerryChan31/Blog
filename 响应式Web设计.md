@@ -8,7 +8,7 @@
  - It is designing your sites with multiple screen sizes/resolutions in mind.
  - Sites should "work" under any platform, any browser size, any orientation.The user should have the power.
 
- ### 需要考虑的概念 Concepts to consider
+### 需要考虑的概念 Concepts to consider
  - Media queries - decting the viewport size 检测
  - Flexible grid-based layout for the relative sizeing
  - Flexible images
@@ -114,7 +114,7 @@
  - You should have min-width instead of max-width
  - 默认设计时，要按照移动视图来进行设计，其次再考虑更大窗口下的展现方式。
 
- ### Media Queries - Part 2
+### Media Queries - Part 2
 
  **Step 1: Grab infomation**
  The meta viewport tag tells mobile browser's viewport how to behave.
