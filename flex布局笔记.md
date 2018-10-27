@@ -88,7 +88,7 @@ CSS 标准为我们提供了 3 种布局方式：标准文档流、浮动布局�
 一些常见布局的写法可以在[阮一峰的博客](http://www.ruanyifeng.com/blog/2015/07/flex-examples.html)中找到。
 
 ### 使用 flex 实现左侧固定右侧浮动两栏布局
-
+```CSS
     .wrapper-flex {
         display: flex;
         align-items: flex-start;
@@ -101,7 +101,7 @@ CSS 标准为我们提供了 3 种布局方式：标准文档流、浮动布局�
     .wrapper-flex .right {
         flex: 1 1 auto;
     }
-
+```
 **需要注意**：flex容器的一个默认属性值:`align-items: stretch;`。这个属性导致了列等高的效果。 为了让两个盒子高度自动，需要设置: `align-items: flex-start;`
 
 

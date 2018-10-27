@@ -3,18 +3,18 @@
 
 ## 元素水平居中
  - 块级元素
-```
+```CSS
     margin: 0 auto 0 auto;
 ```
  - 行内元素
-```
+```CSS
     // 父元素：
     text-align: center;
 ```
 
 ## 元素垂直居中
  - 块级元素
-```
+```CSS
 方法1：
     // 父元素：
     position: relative;
@@ -49,7 +49,7 @@
     align-items: center;
 ```
  - 行内元素
-```
+```CSS
 单行文本：
     // 父元素：
     line-height: @height;
@@ -60,3 +60,4 @@
     display: inline-block;
     line-height: 20px; //reset
     vertical-align: middle;
+```
