@@ -1,3 +1,14 @@
+- [每个开发者都应该知道的SOLID原则](#%E6%AF%8F%E4%B8%AA%E5%BC%80%E5%8F%91%E8%80%85%E9%83%BD%E5%BA%94%E8%AF%A5%E7%9F%A5%E9%81%93%E7%9A%84solid%E5%8E%9F%E5%88%99)
+  - [单一职责原则（SRP）](#%E5%8D%95%E4%B8%80%E8%81%8C%E8%B4%A3%E5%8E%9F%E5%88%99srp)
+    - [它为什么违反了 SRP？](#%E5%AE%83%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9D%E5%8F%8D%E4%BA%86-srp)
+    - [这种设计将来会带来什么问题？](#%E8%BF%99%E7%A7%8D%E8%AE%BE%E8%AE%A1%E5%B0%86%E6%9D%A5%E4%BC%9A%E5%B8%A6%E6%9D%A5%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98)
+  - [开闭原则（OCP）](#%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99ocp)
+    - [如何使它（AnimalSound）符合 OCP？](#%E5%A6%82%E4%BD%95%E4%BD%BF%E5%AE%83animalsound%E7%AC%A6%E5%90%88-ocp)
+  - [里氏替换原则（LSP）](#%E9%87%8C%E6%B0%8F%E6%9B%BF%E6%8D%A2%E5%8E%9F%E5%88%99lsp)
+  - [接口隔离原则（ISP）](#%E6%8E%A5%E5%8F%A3%E9%9A%94%E7%A6%BB%E5%8E%9F%E5%88%99isp)
+  - [依赖倒置原则（DIP）](#%E4%BE%9D%E8%B5%96%E5%80%92%E7%BD%AE%E5%8E%9F%E5%88%99dip)
+  - [小结](#%E5%B0%8F%E7%BB%93)
+
 # 每个开发者都应该知道的SOLID原则
 
 > 转载自[此](https://mp.weixin.qq.com/s/GFABaqzGKloPDZZu-Tc1jQ)，原作者为 Chidume Nnamdi。
