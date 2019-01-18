@@ -24,3 +24,8 @@
 [Web开发者都应该知道的SOLID原则](https://github.com/JerryChan31/Blog/blob/master/SOLID.md)
 
 [正则表达式学习笔记](https://github.com/JerryChan31/Blog/blob/master/regular_expression.md)
+
+## 实习记录
+[Week1](https://github.com/JerryChan31/Blog/blob/master/%E7%AC%AC1%E5%91%A8%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93.md)
+[Week2](https://github.com/JerryChan31/Blog/blob/master/%E7%AC%AC3%EF%BC%8C4%E5%91%A8%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93.md)
+[Week3,4](https://github.com/JerryChan31/Blog/blob/master/%E7%AC%AC3%EF%BC%8C4%E5%91%A8%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93.md)
