@@ -30,4 +30,6 @@
 
 [Week2](https://github.com/JerryChan31/Blog/blob/master/%E7%AC%AC2%E5%91%A8%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93.md)
 
-[Week3,4](https://github.com/JerryChan31/Blog/blob/master/%E7%AC%AC3%EF%BC%8C4%E5%91%A8%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93.md)
+[Week3, 4](https://github.com/JerryChan31/Blog/blob/master/%E7%AC%AC3%EF%BC%8C4%E5%91%A8%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93.md)
+
+[Week5, 6](https://github.com/JerryChan31/Blog/blob/master/%E7%AC%AC5%EF%BC%8C6%E5%91%A8%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93.md)
