@@ -2,6 +2,8 @@
 
 [JavaScript高级程序设计-读书笔记](https://github.com/JerryChan31/Blog/blob/master/JavaScript%E9%AB%98%E7%BA%A7%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0.md)
 
+[由浅入深了解Web触摸开发与Hammerjs源码分析](https://github.com/JerryChan31/Blog/blob/master/touch.md)
+
 ## CSS
 
 [flex布局学习笔记](https://github.com/JerryChan31/Blog/blob/master/flex%E5%B8%83%E5%B1%80%E7%AC%94%E8%AE%B0.md)
