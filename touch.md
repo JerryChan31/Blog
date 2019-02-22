@@ -68,13 +68,16 @@
 
 ### 全局管理 - Manager 类
  - 采用了 Manager 的设计模式，Manager类负责管理全局的状态和流程，输入/手势识别器/触摸动作实例的创建和销毁。（manager.js)
-
+ - Manager 的架构：
+ ![](https://github.com/JerryChan31/Blog/blob/master/asset/Hammerjs%E6%9E%B6%E6%9E%84.png)
 ### 处理输入 - Input 类
  - 将不同形式的输入（如鼠标，触摸等）统一化。（/input)
  - 根据触摸点的信息计算出手势的信息，如 direction, angle, rotation, velocity 等等。(/inputjs)
  - 将信息返回给 Manager 类。(input-handler.js)
 
 ### 识别手势 - Recognizer类
+ - Recognizer 类的结构：
+![](https://github.com/JerryChan31/Blog/blob/master/asset/recognizer.jpg)
  - 当一个输入会话（input session）开始时，所有的识别器都是`Possible`状态。
  - 输入会话的定义：从第一个输入到最后一个输入，其中的所有动作。
  - 每个识别周期都会执行`manager.recognize()`来更新识别器的状态。
