@@ -31,4 +31,28 @@ Zen-like Commit 的提交工具。
 ### Gitlens
 在编辑器内直接查看代码的修改历史。
 
-### 
+### Bracket Pair Colorizer
+给代码内的花括号配色，使代码层级更明显。
+
+### Debugger For Chrome
+映射 Debugger 到 Chrome 浏览器。
+
+### One Dark Pro
+目前在用的颜色主题。
+
+### Import Cost
+实时反馈引入一个包的大小耗费。
+
+## 浏览器插件
+
+### Adblock Plus
+拦截页面广告。
+
+### Vimium
+使用键盘轻松浏览网页，使用 Vim 的键位设置。
+
+### Pocket
+稍后阅读神器，阅读博客时保存到Pocket可获得更整洁的排版。
+
+### PageRuler
+度量页面尺寸，取色等功能。
