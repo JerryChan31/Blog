@@ -15,21 +15,13 @@
 
 > 摘要：本文主要记录我在服务器上使用 GitHub 的 Webhooks 进行网站自动化部署的过程。最终效果：开发终端向 Github 仓库推送代码后，服务器端自动拉取仓库并重启服务器。搭建过程主要参考了 [lovelucy.info](https://www.lovelucy.info/auto-deploy-website-by-webhooks-of-github-and-gitlab.html) 的博客。
 
+> 2019-03-19更新：给毕业设计搭建代码自动部署，遇到了脚本调用守护进程时，守护进程不能正常执行的问题。在此非常感谢[node中创建服务进程](http://www.cnblogs.com/accordion/p/6828097.html#commentform)这篇文章给予我的帮助，完美地解决了我的问题。
+
 搭建环境：我正在使用的是 Vultr 的服务器，系统版本是 CentOS 7 x64。
 
 ## 在服务器上安装 Node.js
 
-最简单的方法：从 EPEL 库安装 Node.js
-
-    $ sudo yum install epel-release
-    $ sudo yum install nodejs
-    // 检查是否成功安装
-    $ node --version
-    $ npm --version
-
-（注：未经本人测试，版本可能相对较老。）
-
-我个人搭建过程中使用了 [Node.js 官网](https://nodejs.org/zh-cn/download/) 的 Linux 二进制文件来安装 Node.js。下载安装包时要留意 Linux 的版本。（X86/X64）
+经过踩坑，通过更新EPEL库使用yum下载nodejs的方法，下载的版本比较老旧。我个人搭建过程中使用了 [Node.js 官网](https://nodejs.org/zh-cn/download/) 的 Linux 二进制文件来安装 Node.js，我个人也更推荐这种做法。下载安装包时要留意 Linux 的版本。（X86/X64）
 
     // Node.js 安装目录
     $ cd /usr/local/bin 
@@ -61,6 +53,8 @@
 
 至此，成功在服务器上安装最新版本的 Node.js。
 
+> 如果不是安装在`/usr/local/bin`目录，需要通过`ln -s node安装目录/bin/node /usr/local/bin`以及`ln -s node安装目录/bin/npm /usr/local/bin` 的方法来给 node 和 npm 创建链接。
+
 ## 编写拉取仓库、重启服务器脚本
 
 一个可供参考的例子：deploy.sh
@@ -79,6 +73,8 @@
     npm install
     npm run start
     echo "Finished."
+
+可以按照自己的需要编写脚本。
 
 ## 配置 Github 仓库的 Webhook 设置
 
@@ -104,7 +100,10 @@
     
     function run_cmd(cmd, args, callback) {
     var spawn = require('child_process').spawn;
-    var child = spawn(cmd, args);
+    var child = spawn(cmd, args, {
+        detached: true,
+        stdio: [process.stdin,process.stdout,process.stderr]
+    });
     var resp = "";
     
     child.stdout.on('data', function(buffer) { resp += buffer.toString(); });
@@ -140,15 +139,85 @@
     })
     */
 
+***
+**2019-03-19更新：**
+脚本在`spawn`的参数列表中加入了第三个参数：
+```js
+{
+  detached: true,
+  stdio: [process.stdin,process.stdout,process.stderr]
+}
+```
+>在 node 环境下，如果不针对子进程的 stdio 做一些特殊处理父进程其实不会真正退出，而是直到子进程执行完毕后再退出。之所以出现这种情况是由于 node 创建子进程时默认会通过 pipe 方式将子进程的输出导流到父进程的 stream 中（childProcess.stdout、childProcess.stderr），提供在父进程中输出子进程消息的能力。
+>`detached`选项可以让node原生帮我们创建一个daemon进程，设置`datached`为true可以创建一个新的session和进程组，子进程的pid为新创建进程组的组pid，这与setsid起到相同的作用。此时的子进程已经和其父进程属于两个session，因此父进程的退出和中断信号不会传递给子进程，子进程不会接受到父进程的中断信号自然也不会退出。当父进程结束之后，子进程变为孤儿进程从而被init进程接收，ppid设置为1。
+
+加入这两个参数的原因是因为，在使用原来的js脚本执行bash脚本时，如果bash脚本中使用pm2这样的守护程序，在bash脚本执行结束后，执行过程中创建的pm2进程也会中断掉。
+
+上面引用段落引用自[node中创建服务进程](http://www.cnblogs.com/accordion/p/6828097.html#commentform)，我的个人理解是：
+
+设置`detached`为`true`之后，`spawn`在运行时创建了新的session和进程组，父进程的的退出和中断信号不会传递给子进程。
+
+设置`stdio: [process.stdin,process.stdout,process.stderr]`之后，子进程的stdio被设置为当前终端，这样一来bash脚本的环境就相当于提升了一级，直接和终端进行io交互。
+
+***
+
+
 这里 Node.js 监听的是 7777 端口，你也可以使用 Nginx 反向代理到 80 端口。
 
-用下面的命令测试一下，接收到 push 之后控制台会有输出：
+用下面的命令测试一下，接收到 push 之后控制台会有输出，你可以在配置 webhook 的页面下重复触发同一个hook，无需多次 commit & push。
 
     $ node deploy.js
 
 如果没什么问题，forever 就可以开起来了。
 
     $ forever start deploy.js
+
+***
+
+**2019-03-19更新：**
+进程守护工具更新：pm2
+比起forever，pm2提供了更全面的监控功能，可用于产品级服务。
+[pm2 使用介绍](https://segmentfault.com/a/1190000002539204)
+
+用法：
+```bash
+$ npm install pm2 -g     # 命令行安装 pm2 
+$ pm2 start app.js -i 4  # 后台运行pm2，启动4个app.js 
+                         # 也可以把'max' 参数传递给 start
+                         # 正确的进程数目依赖于Cpu的核心数目
+$ pm2 start app.js --name my-api # 命名进程
+$ pm2 list               # 显示所有进程状态
+$ pm2 monit              # 监视所有进程
+$ pm2 logs               # 显示所有进程日志
+$ pm2 stop all           # 停止所有进程
+$ pm2 restart all        # 重启所有进程
+$ pm2 reload all         # 0 秒停机重载进程 (用于 NETWORKED 进程)
+$ pm2 stop 0             # 停止指定的进程
+$ pm2 restart 0          # 重启指定的进程
+$ pm2 startup            # 产生 init 脚本 保持进程活着
+$ pm2 web                # 运行健壮的 computer API endpoint (http://localhost:9615)
+$ pm2 delete 0           # 杀死指定的进程
+$ pm2 delete all         # 杀死全部进程
+```
+
+运行进程的不同方式：
+```bash
+$ pm2 start app.js -i max    # 根据有效CPU数目启动最大进程数目
+$ pm2 start app.js -i 3      # 启动3个进程
+$ pm2 start app.js -x        #用fork模式启动 app.js 而不是使用 cluster
+$ pm2 start app.js -x -- -a 23   # 用fork模式启动 app.js 并且传递参数 (-a 23)
+$ pm2 start app.js --name serverone  # 启动一个进程并把它命名为 serverone
+$ pm2 stop serverone       # 停止 serverone 进程
+$ pm2 start app.json        # 启动进程, 在 app.json里设置选项
+$ pm2 start app.js -i max -- -a 23                   #在--之后给 app.js 传递参数
+$ pm2 start app.js -i max -e err.log -o out.log  # 启动 并 生成一个配置文件
+你也可以执行用其他语言编写的app  ( fork 模式):
+$ pm2 start my-bash-script.sh    -x --interpreter bash
+$ pm2 start my-python-script.py -x --interpreter python
+```
+
+***
+
 
 ## 其他问题
 
