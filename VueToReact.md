@@ -1,6 +1,6 @@
-# 从 Vue 到 JSX - 快速上手指南
+# 从 Vue 到 React - 快速上手指南
 
-
+本文是个人从 Vue 技术栈转移到 React 技术栈的一些总结。本文试图将 Vue 中的一些概念和 React 中的概念对应起来，方便 Vue 的开发者更快地上手 React。个人学习 React 时间不长，如有错漏，烦请斧正。
 
 ## 模版语法
 
@@ -51,7 +51,7 @@ JSX :`map()`
 </ul>
 ```
 
-注：如果一个 `map()` 嵌套了太多层级，那可能就是你提取组件的一个好时机。
+> 注：如果一个 `map()` 嵌套了太多层级，那可能就是你提取组件的一个好时机。
 
 ## 生命周期钩子
 
@@ -64,11 +64,13 @@ JSX :`map()`
 - beforeDestroy/destroyed
 - errorCaptured
 
-大家比较熟悉，不再赘述
+大家比较熟悉，不再赘述。
 
 **React:**
 
 [生命周期钩子函数图示]([http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/))
+
+**！！Taro 用的还是旧的生命周期钩子函数！！**
 
 **挂载**：当组件实例被创建并插入 DOM 中时，其生命周期调用顺序如下：
 
@@ -96,4 +98,5 @@ JSX :`map()`
 
 > 注：一些旧的资料/代码/教程中会用到`componentWillMount()`，`componentWillUpdate()`，`componentWillReceiveProps()`这三个生命周期钩子函数。在 React 16.3 中，React团队为上面三个生命周期钩子加上了 UNSAFE 标记。**React 团队计划在 17.0 中测地废弃掉这几个 API**。改动的原因和异步渲染有关，详见[Update on Async Rendering](https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state)。
 >
-> — 引用自[谈谈React新的生命周期钩子](https://juejin.im/post/5b72d8fbe51d45662b0752af)
+> — 归纳自[谈谈React新的生命周期钩子](https://juejin.im/post/5b72d8fbe51d45662b0752af)
+
