@@ -1,8 +1,24 @@
-# 从 Vue 到 React - 快速上手指南
 
-本文是个人从 Vue 技术栈转移到 React 技术栈的一些总结。本文试图将 Vue 中的一些概念和 React 中的概念对应起来，方便 Vue 的开发者更快地上手 React。个人学习 React 时间不长，如有错漏，烦请斧正。
 
-## 模版语法
+# 从 Vue 到 Taro - 快速上手指南
+
+本文是个人从 Vue 技术栈转移到 Taro 技术栈的一些总结。本文试图将 Vue 中的一些概念和 Taro 中的概念对应起来，方便 Vue 的开发者更快地上手 Taro。个人学习 Taro 时间不长，如有错漏，烦请斧正。
+
+## JSX
+
+### 简介
+
+```jsx
+const element = <h1>Hello, world!</h1>;
+```
+
+> JSX是一个 JavaScript 的语法扩展。我们建议在 React 中配合使用 JSX，JSX 可以很好地描述 UI 应该呈现出它应有交互的本质形式。JSX 可能会使人联想到模版语言，但它具有 JavaScript 的全部功能。
+>
+> ——[React - JSX 简介](https://zh-hans.reactjs.org/docs/introducing-jsx.html)
+
+个人理解：写在 Javascript 中的模版语言
+
+### 模版语法
 
 Vue: 
 
@@ -13,12 +29,12 @@ Vue:
 JSX:
 
 ```jsx
-<span>Message: { mag }</span>
+<span>Message: { msg }</span>
 ```
 
 **JSX 允许在大括号中嵌入任何表达式**
 
-## 条件渲染
+### 条件渲染
 
 Vue : `v-if`
 
@@ -33,7 +49,48 @@ JSX : `&&`和 `? :`
 <h1>React is { awesome ? 'very' : 'very very'} awesome!</h1> // 三目运算符
 ```
 
-## 列表渲染
+**复杂条件** —— 个人认为以**代码可读性**为标准
+
+
+```jsx
+// Example 1
+render () {
+  const length:number = this.props.card.img.length
+  const renderImgs:JSX.Element[] = []
+  if (length > 0 && length < 3) {
+    renderImgs.push(<Image className='pic-card__single-pic' src={this.props.card.img[0]}/>)
+  } else if (length >= 3) {
+    for (let i = 0; i < 3; i++) {
+      renderImgs.push(<Image className='pic-card__multi-pic' src={this.props.card.img[i]}/>)        
+    }
+  }
+  return (
+    <BaseCard card={this.props.card}>
+      {renderImgs}
+    </BaseCard>
+  )
+}
+
+// Example 2
+render () {
+  const length:number = this.props.card.img.length
+  return (
+    <BaseCard card={this.props.card}>
+      { length > 0 && length < 3 && // 1-2张，显示1张
+        <Image className='pic-card__single-pic' src={this.props.card.img[0]}></Image>} 
+      { length >= 3 && // 大于3图，显示3张
+        <View>
+          <Image className='pic-card__multi-pic' src={this.props.card.img[0]}/>
+          <Image className='pic-card__multi-pic' src={this.props.card.img[1]}/>
+          <Image className='pic-card__multi-pic' src={this.props.card.img[2]}/>
+        </View>
+      }
+    </BaseCard>
+  )
+}
+```
+
+### 列表渲染
 
 Vue : `v-for`
 
@@ -53,7 +110,40 @@ JSX :`map()`
 
 > 注：如果一个 `map()` 嵌套了太多层级，那可能就是你提取组件的一个好时机。
 
-## 生命周期钩子
+## React
+
+### 组件、props 与 state
+
+Vue: 单文件组件
+
+React: 基于 ES6 class 的组件
+
+```React
+class Clock extends React.Component {
+  constructor(props) { // 一般在构造函数中初始化 state
+    super(props);
+    this.state = {date: new Date()};
+  }
+
+  componentDidMount() {
+    // 生命周期函数
+    // 请求数据……
+  }
+  
+  render() { // 一个组件类必须要实现一个 render 方法，这个 render 方法必须要返回一个JSX 元素
+    return (
+      <div> 
+        <h1>Hello, world!</h1>
+        <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
+      </div>
+    );
+  }
+}
+```
+
+
+
+### 生命周期钩子
 
 **Vue:**
 
@@ -68,7 +158,7 @@ JSX :`map()`
 
 **React:**
 
-[生命周期钩子函数图示]([http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/))
+[生命周期钩子函数图示](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)
 
 **！！Taro 用的还是旧的生命周期钩子函数！！**
 
@@ -100,3 +190,6 @@ JSX :`map()`
 >
 > — 归纳自[谈谈React新的生命周期钩子](https://juejin.im/post/5b72d8fbe51d45662b0752af)
 
+## MobX
+
+## Typescript
