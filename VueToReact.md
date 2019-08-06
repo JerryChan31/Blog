@@ -32,7 +32,26 @@ JSX:
 <span>Message: { msg }</span>
 ```
 
-**JSX 允许在大括号中嵌入任何表达式**
+一些细节：
+
+- JSX 允许在大括号中嵌入任何有效的 Javascript 表达式
+
+- JSX 自动完成了转义，以防止 XSS 攻击
+
+- Babel 会将 JSX 转译成 `React.createElement()`函数调用
+
+一个简化过的 React 元素实例：
+
+```javascript
+// 注意：这是简化过的结构
+const element = {
+  type: 'h1',
+  props: {
+    className: 'greeting',
+    children: 'Hello, world!'
+  }
+}
+```
 
 ### 条件渲染
 
@@ -55,17 +74,18 @@ JSX : `&&`和 `? :`
 ```jsx
 // Example 1
 render () {
-  const length:number = this.props.card.img.length
+  const card = this.props.card
+  const length:number = card.length
   const renderImgs:JSX.Element[] = []
   if (length > 0 && length < 3) {
-    renderImgs.push(<Image className='pic-card__single-pic' src={this.props.card.img[0]}/>)
+    renderImgs.push(<Image className='pic-card__single-pic' src={card.img[0]}/>)
   } else if (length >= 3) {
     for (let i = 0; i < 3; i++) {
-      renderImgs.push(<Image className='pic-card__multi-pic' src={this.props.card.img[i]}/>)        
+      renderImgs.push(<Image className='pic-card__multi-pic' src={card.img[i]}/>)        
     }
   }
   return (
-    <BaseCard card={this.props.card}>
+    <BaseCard card={card}>
       {renderImgs}
     </BaseCard>
   )
@@ -73,16 +93,17 @@ render () {
 
 // Example 2
 render () {
-  const length:number = this.props.card.img.length
+  const card = this.props.card
+  const length:number = card.img.length
   return (
     <BaseCard card={this.props.card}>
       { length > 0 && length < 3 && // 1-2张，显示1张
-        <Image className='pic-card__single-pic' src={this.props.card.img[0]}></Image>} 
+        <Image className='pic-card__single-pic' src={card.img[0]}></Image>} 
       { length >= 3 && // 大于3图，显示3张
         <View>
-          <Image className='pic-card__multi-pic' src={this.props.card.img[0]}/>
-          <Image className='pic-card__multi-pic' src={this.props.card.img[1]}/>
-          <Image className='pic-card__multi-pic' src={this.props.card.img[2]}/>
+          <Image className='pic-card__multi-pic' src={card.img[0]}/>
+          <Image className='pic-card__multi-pic' src={card.img[1]}/>
+          <Image className='pic-card__multi-pic' src={card.img[2]}/>
         </View>
       }
     </BaseCard>
@@ -108,13 +129,18 @@ JSX :`map()`
 </ul>
 ```
 
-> 注：如果一个 `map()` 嵌套了太多层级，那可能就是你提取组件的一个好时机。
+注：
+1. 与 Vue 相同，每一项都必须设置`key`属性
+2. 如果列表项目的顺序可能会变化，则不建议使用索引来用作`key`值，因为这样做会导致性能变差，还可能引起组件状态的问题。如果你选择不指定显式的 key 值，那么 React 将默认使用索引用作为列表项目的 key 值。
+3. 如果一个 `map()` 嵌套了太多层级，那可能就是你提取组件的一个好时机。
+
+延伸阅读：[深度解析使用索引作为 key 的负面影响](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318)，[深入解析为什么 key 是必须的](https://zh-hans.reactjs.org/docs/reconciliation.html#recursing-on-children)。
 
 ## React
 
 ### 组件、props 与 state
 
-Vue: 单文件组件
+Vue: 单文件组件，props与data
 
 React: 基于 ES6 class 的组件
 
@@ -154,8 +180,6 @@ class Clock extends React.Component {
 - beforeDestroy/destroyed
 - errorCaptured
 
-大家比较熟悉，不再赘述。
-
 **React:**
 
 [生命周期钩子函数图示](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)
@@ -164,18 +188,18 @@ class Clock extends React.Component {
 
 **挂载**：当组件实例被创建并插入 DOM 中时，其生命周期调用顺序如下：
 
-- constructor()
-- static getDerivedStateFromProps()
-- render()
-- componentDidMount()
+- `constructor()`
+- `componentWillMount()`
+- `render()`
+- `componentDidMount()`
 
 **更新**：当组件的 props 或 state 发生变化时会触发更新。组件更新的生命周期调用顺序如下：
 
-- static getDerivedStateFromProps()
-- shouldComponentUpdate()
-- render()
-- getSnapshotBeforeUpdate()
-- componentDidUpdate()
+- `componentWillReceiveProps()`
+- `shouldComponentUpdate()`
+- `componentWillUpdate()`
+- `render()`
+- `componentDidUpdate()`
 
 **卸载**：当组件从 DOM 中移除时会调用如下方法：
 
