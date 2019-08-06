@@ -182,9 +182,7 @@ class Clock extends React.Component {
 
 **React:**
 
-[生命周期钩子函数图示](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)
-
-**！！Taro 用的还是旧的生命周期钩子函数！！**
+！！Taro 用的还是旧的生命周期钩子函数！！**
 
 **挂载**：当组件实例被创建并插入 DOM 中时，其生命周期调用顺序如下：
 
