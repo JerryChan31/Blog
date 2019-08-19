@@ -1,5 +1,3 @@
-
-
 # 从 Vue 到 Taro - 快速上手指南
 
 本文是个人从 Vue 技术栈转移到 Taro 技术栈的一些总结。本文试图将 Vue 中的一些概念和 Taro 中的概念对应起来，方便 Vue 的开发者更快地上手 Taro。个人学习 Taro 时间不长，如有错漏，烦请斧正。
@@ -182,7 +180,9 @@ class Clock extends React.Component {
 
 **React:**
 
-！！Taro 用的还是旧的生命周期钩子函数！！**
+**！！Taro 用的还是旧的生命周期钩子函数！！**
+
+![未命名文件](/Users/jerrychan/Downloads/未命名文件.jpg)
 
 **挂载**：当组件实例被创建并插入 DOM 中时，其生命周期调用顺序如下：
 
@@ -212,6 +212,26 @@ class Clock extends React.Component {
 >
 > — 归纳自[谈谈React新的生命周期钩子](https://juejin.im/post/5b72d8fbe51d45662b0752af)
 
+### 组合 VS 继承
+
+> 在 Facebook，我们在成百上千个组件中使用 React。我们并没有发现需要使用继承来构建组件层次的情况。
+
+个人尝试：BaseCard - PicCard - VoteCard
+
+HOC
+
 ## MobX
+
+### observable
+
+1. 如果 **value** 是ES6的 `Map` : 会返回一个新的 [Observable Map](https://cn.mobx.js.org/refguide/map.html)。如果你不只关注某个特定entry的更改，而且对添加或删除其他entry时也做出反应的话，那么 Observable maps 会非常有用
+2. 如果 **value** 是数组，会返回一个 [Observable Array](https://cn.mobx.js.org/refguide/array.html)。
+3. 如果 **value** 是没有原型的对象，那么对象会被克隆并且所有的属性都会被转换成可观察的。参见 [Observable Object](https://cn.mobx.js.org/refguide/object.html)。
+4. 如果 **value** 是有原型的对象，JavaSript 原始数据类型或者函数，会返回一个 [Boxed Observable](https://cn.mobx.js.org/refguide/boxed.html)。MobX 不会将一个有原型的对象自动转换成可观察的，因为这是它构造函数的职责。在构造函数中使用 `extendObservable` 或者在类定义中使用 `@observable`。
+5. 如果 **value** 是有原型的对象，JavaSript 原始数据类型或者函数，`observable` 会抛出。如果想要为这样的值创建一个独立的可观察引用，请使用 [Boxed Observable](https://cn.mobx.js.org/refguide/boxed.html) observable 代替。MobX 不会将一个有原型的对象自动转换成可观察的，因为这是它构造函数的职责。在构造函数中使用 `extendObservable` 或在类定义上使用 `@observable` / `decorate` 。
+
+核心章节：https://cn.mobx.js.org/best/react.html
+
+
 
 ## Typescript
