@@ -1,6 +1,118 @@
 # 从 Vue 到 Taro - 快速上手指南
 
-本文是个人从 Vue 技术栈转移到 Taro 技术栈的一些总结。本文试图将 Vue 中的一些概念和 Taro 中的概念对应起来，方便 Vue 的开发者更快地上手 Taro。个人学习 Taro 时间不长，如有错漏，烦请斧正。
+本文是个人从 Vue 技术栈转移到 Taro 技术栈的一些总结。
+
+## 概览
+
+### 对于不了解 Taro 的朋友
+
+**Taro** 是一套遵循 [React](https://reactjs.org/) 语法规范的 **多端开发** 解决方案。现如今市面上端的形态多种多样，Web、React-Native、微信小程序等各种端大行其道，当业务要求同时在不同的端都要求有所表现的时候，针对不同的端去编写多套代码的成本显然非常高，这时候只编写一套代码就能够适配到多端的能力就显得极为需要。
+
+使用 **Taro**，我们可以只书写一套代码，再通过 **Taro** 的编译工具，将源代码分别编译出可以在不同端（微信/百度/支付宝/字节跳动/QQ小程序、快应用、H5、React-Native 等）运行的代码。
+
+通过编译抹平平台差异，实现 **Write once, run anywhere** 的梦想
+
+### 区别于目前业务中用到的 Vue 技术栈
+
+目前团队在 Taro Hybrid 开发中使用到的、区别与目前业务中用到的 Vue 技术栈的技术主要有：
+
+- React
+- Mobx
+- Typescript
+
+> [《为何我们要用 React 来写小程序 - Taro 诞生记》这篇文章](https://aotu.io/notes/2018/06/25/the-birth-of-taro/index.html)解释了 Taro 团队为什么选择了 React 语法，摘要下来是以下几点：
+>
+> 相同点：
+>
+> - **生命周期**：小程序的生命周期和 React 的生命周期，在很大程度上是类似的。
+> - **数据更新方式**：在 React 中，组件的内部数据是用 `state` 来进行管理的，而在小程序中组件的内部数据都是用 `data` 来进行管理，两者具有一定相似性。而同时在 React 中，我们更新数据使用的是 `setState` 方法，传入新的数据或者生成新数据的函数，从而更新相应视图。在小程序中，则对应的有 `setData` 方法，传入新的数据，从而更新视图。
+> - **事件绑定**：小程序中绑定事件使用的是 `bind + 事件名` 的方式，React 里，则是 `on + 事件名` 的方式。
+>
+> 差异：
+>
+> - **模版**：小程序使用模版字符串，React 使用 JSX。 （ Taro 的做法：使用`babel` 的核心编译器`babylon`构造 AST，对 AST 进行转换操作，得出需要的新 AST，再将新 AST 进行递归遍历，生成小程序的模板。通过穷举的方式，将常用的、React 官方推荐的写法作为转换规则加以支持，而一些比较生僻的，或者是不那么推荐的写的写法则不做支持，转而以 `eslint` 插件的方式，提示用户进行修改。）
+
+## React
+
+### 组件、props 与 state
+
+Vue: 单文件组件，props与data
+
+React: 基于 ES6 class 的组件
+
+```React
+class Clock extends React.Component {
+  constructor(props) { // 一般在构造函数中初始化 state
+    super(props);
+    this.state = {date: new Date()};
+  }
+
+  componentDidMount() {
+    // 生命周期函数
+    // 请求数据……
+  }
+  
+  render() { // 一个组件类必须要实现一个 render 方法，这个 render 方法必须要返回一个JSX 元素
+    return (
+      <div> 
+        <h1>Hello, world!</h1>
+        <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
+      </div>
+    );
+  }
+}
+```
+
+
+
+### 生命周期钩子
+
+**Vue:**
+
+- beforeCreate/created
+- beforeMount/mounted
+- beforeUpdate/updated
+- activated/deactivated
+- beforeDestroy/destroyed
+- errorCaptured
+
+**React:**
+
+**挂载**：当组件实例被创建并插入 DOM 中时，其生命周期调用顺序如下：
+
+- `constructor()`
+- `componentWillMount()`
+- `render()`
+- `componentDidMount()`
+
+**更新**：当组件的 props 或 state 发生变化时会触发更新。组件更新的生命周期调用顺序如下：
+
+- `componentWillReceiveProps()`
+- `shouldComponentUpdate()`
+- `componentWillUpdate()`
+- `render()`
+- `componentDidUpdate()`
+
+**卸载**：当组件从 DOM 中移除时会调用如下方法：
+
+- componentWillUnmount()
+
+**错误处理**：当渲染过程，生命周期，或子组件的构造函数中抛出错误时，会调用如下方法：
+
+- static getDerivedStateFromError()
+- componentDidCatch()
+
+![未命名文件](https://github.com/JerryChan31/Blog/raw/master/asset/react-life-cycle.jpg)
+
+> 注：在 React 16.3 中，React团队为`componentWillMount()`，`componentWillUpdate()`，`componentWillReceiveProps()`这三个生命周期钩子加上了 UNSAFE 标记。**React 团队计划在 17.0 中测地废弃掉这几个 API**。改动的原因和异步渲染有关，可能会导致这些生命周期函数重复执行，详见[Update on Async Rendering](https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state)。
+>
+> — 归纳自[谈谈React新的生命周期钩子](https://juejin.im/post/5b72d8fbe51d45662b0752af)
+
+### 组合 VS 继承
+
+> 在 Facebook，我们在成百上千个组件中使用 React。我们并没有发现需要使用继承来构建组件层次的情况。
+
+个人尝试：BaseCard - PicCard - VoteCard
 
 ## JSX
 
@@ -36,7 +148,7 @@ JSX:
 
 - JSX 自动完成了转义，以防止 XSS 攻击
 
-- Babel 会将 JSX 转译成 `React.createElement()`函数调用
+- 每一个 JSX 元素其实都是 `React.createElement()`函数的语法糖
 
 一个简化过的 React 元素实例：
 
@@ -133,92 +245,6 @@ JSX :`map()`
 3. 如果一个 `map()` 嵌套了太多层级，那可能就是你提取组件的一个好时机。
 
 延伸阅读：[深度解析使用索引作为 key 的负面影响](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318)，[深入解析为什么 key 是必须的](https://zh-hans.reactjs.org/docs/reconciliation.html#recursing-on-children)。
-
-## React
-
-### 组件、props 与 state
-
-Vue: 单文件组件，props与data
-
-React: 基于 ES6 class 的组件
-
-```React
-class Clock extends React.Component {
-  constructor(props) { // 一般在构造函数中初始化 state
-    super(props);
-    this.state = {date: new Date()};
-  }
-
-  componentDidMount() {
-    // 生命周期函数
-    // 请求数据……
-  }
-  
-  render() { // 一个组件类必须要实现一个 render 方法，这个 render 方法必须要返回一个JSX 元素
-    return (
-      <div> 
-        <h1>Hello, world!</h1>
-        <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
-      </div>
-    );
-  }
-}
-```
-
-
-
-### 生命周期钩子
-
-**Vue:**
-
-- beforeCreate/created
-- beforeMount/mounted
-- beforeUpdate/updated
-- activated/deactivated
-- beforeDestroy/destroyed
-- errorCaptured
-
-**React:**
-
-**！！Taro 用的还是旧的生命周期钩子函数！！**
-
-![未命名文件](/Users/jerrychan/Downloads/未命名文件.jpg)
-
-**挂载**：当组件实例被创建并插入 DOM 中时，其生命周期调用顺序如下：
-
-- `constructor()`
-- `componentWillMount()`
-- `render()`
-- `componentDidMount()`
-
-**更新**：当组件的 props 或 state 发生变化时会触发更新。组件更新的生命周期调用顺序如下：
-
-- `componentWillReceiveProps()`
-- `shouldComponentUpdate()`
-- `componentWillUpdate()`
-- `render()`
-- `componentDidUpdate()`
-
-**卸载**：当组件从 DOM 中移除时会调用如下方法：
-
-- componentWillUnmount()
-
-**错误处理**：当渲染过程，生命周期，或子组件的构造函数中抛出错误时，会调用如下方法：
-
-- static getDerivedStateFromError()
-- componentDidCatch()
-
-> 注：一些旧的资料/代码/教程中会用到`componentWillMount()`，`componentWillUpdate()`，`componentWillReceiveProps()`这三个生命周期钩子函数。在 React 16.3 中，React团队为上面三个生命周期钩子加上了 UNSAFE 标记。**React 团队计划在 17.0 中测地废弃掉这几个 API**。改动的原因和异步渲染有关，详见[Update on Async Rendering](https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state)。
->
-> — 归纳自[谈谈React新的生命周期钩子](https://juejin.im/post/5b72d8fbe51d45662b0752af)
-
-### 组合 VS 继承
-
-> 在 Facebook，我们在成百上千个组件中使用 React。我们并没有发现需要使用继承来构建组件层次的情况。
-
-个人尝试：BaseCard - PicCard - VoteCard
-
-HOC
 
 ## MobX
 
