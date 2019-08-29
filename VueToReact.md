@@ -1,6 +1,6 @@
-# 从 Vue 到 Taro - 快速上手指南
+# 从 Vue 到 Taro
 
-本文是个人从 Vue 技术栈转移到 Taro 技术栈的一些总结。
+
 
 ## 概览
 
@@ -95,14 +95,9 @@ class Clock extends React.Component {
 
 **卸载**：当组件从 DOM 中移除时会调用如下方法：
 
-- componentWillUnmount()
+- `componentWillUnmount()`
 
-**错误处理**：当渲染过程，生命周期，或子组件的构造函数中抛出错误时，会调用如下方法：
-
-- static getDerivedStateFromError()
-- componentDidCatch()
-
-![未命名文件](https://github.com/JerryChan31/Blog/raw/master/asset/react-life-cycle.jpg)
+![未命名文件](https://github.com/JerryChan31/Blog/blob/master/asset/react-life-cycle.png?raw=true)
 
 > 注：在 React 16.3 中，React团队为`componentWillMount()`，`componentWillUpdate()`，`componentWillReceiveProps()`这三个生命周期钩子加上了 UNSAFE 标记。**React 团队计划在 17.0 中测地废弃掉这几个 API**。改动的原因和异步渲染有关，可能会导致这些生命周期函数重复执行，详见[Update on Async Rendering](https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state)。
 >
@@ -188,10 +183,10 @@ render () {
   const length:number = card.length
   const renderImgs:JSX.Element[] = []
   if (length > 0 && length < 3) {
-    renderImgs.push(<Image className='pic-card__single-pic' src={card.img[0]}/>)
+    renderImgs.push(<Image src={card.img[0]}/>)
   } else if (length >= 3) {
     for (let i = 0; i < 3; i++) {
-      renderImgs.push(<Image className='pic-card__multi-pic' src={card.img[i]}/>)        
+      renderImgs.push(<Image src={card.img[i]}/>)        
     }
   }
   return (
@@ -208,12 +203,12 @@ render () {
   return (
     <BaseCard card={this.props.card}>
       { length > 0 && length < 3 && // 1-2张，显示1张
-        <Image className='pic-card__single-pic' src={card.img[0]}></Image>} 
+        <Image src={card.img[0]}></Image>} 
       { length >= 3 && // 大于3图，显示3张
         <View>
-          <Image className='pic-card__multi-pic' src={card.img[0]}/>
-          <Image className='pic-card__multi-pic' src={card.img[1]}/>
-          <Image className='pic-card__multi-pic' src={card.img[2]}/>
+          <Image src={card.img[0]}/>
+          <Image src={card.img[1]}/>
+          <Image src={card.img[2]}/>
         </View>
       }
     </BaseCard>
@@ -248,16 +243,202 @@ JSX :`map()`
 
 ## MobX
 
-### observable
+Vuex 中的很多概念，都可以在 MobX中找到完全对应的概念：
 
-1. 如果 **value** 是ES6的 `Map` : 会返回一个新的 [Observable Map](https://cn.mobx.js.org/refguide/map.html)。如果你不只关注某个特定entry的更改，而且对添加或删除其他entry时也做出反应的话，那么 Observable maps 会非常有用
-2. 如果 **value** 是数组，会返回一个 [Observable Array](https://cn.mobx.js.org/refguide/array.html)。
-3. 如果 **value** 是没有原型的对象，那么对象会被克隆并且所有的属性都会被转换成可观察的。参见 [Observable Object](https://cn.mobx.js.org/refguide/object.html)。
-4. 如果 **value** 是有原型的对象，JavaSript 原始数据类型或者函数，会返回一个 [Boxed Observable](https://cn.mobx.js.org/refguide/boxed.html)。MobX 不会将一个有原型的对象自动转换成可观察的，因为这是它构造函数的职责。在构造函数中使用 `extendObservable` 或者在类定义中使用 `@observable`。
-5. 如果 **value** 是有原型的对象，JavaSript 原始数据类型或者函数，`observable` 会抛出。如果想要为这样的值创建一个独立的可观察引用，请使用 [Boxed Observable](https://cn.mobx.js.org/refguide/boxed.html) observable 代替。MobX 不会将一个有原型的对象自动转换成可观察的，因为这是它构造函数的职责。在构造函数中使用 `extendObservable` 或在类定义上使用 `@observable` / `decorate` 。
+- `state` --- `observable`
+- `getter` --- `computed`
+- `mutation` --- `action`
+- `action` --- `async action` /` flow`
 
-核心章节：https://cn.mobx.js.org/best/react.html
+不同的是，MobX 更灵活，你可以在组件内声明 observable，又或者直接修改 observable 的值。
+
+但在大型项目中的最佳实践和 Vuex 是保持一致的：只使用全局的 store，统一通过 action 来修改 observable 的值。
+
+### 感染性
+
+默认情况下将一个数据结构转换成可观察的是**有感染性的**，这意味着 `observable` 被自动应用于数据结构包含的任何值，或者将来会被该数据结构包含的值。
+
+### 性能优化
+
+> [使用 MobX开发高性能 React 应用](https://foio.github.io/mobx-react/)
+
+React 整个的渲染机制就是在 `state/props` 发生改变的时候，重新渲染所有的节点，构造出新的虚拟 DOM tree 跟原来的 DOM tree 用 Diff 算法进行比较，得到需要更新的地方在批量造作在真实的 DOM 上，由于这样做就减少了对 DOM 的频繁操作，从而提升的性能。
+
+借助于 mobx 框架对 `observable` 变量引用的跟踪和依赖收集，mobx 能够精确地得到 react 组件对 `observable` 变量的依赖图谱，然后再用经典的 `ShallowCompare` 实现细粒度的 `shouldComponentUpdate` 函数，以达到100%无浪费 render 。这一切都是自动完成地，fantastic！使用 mobx 后，我们再也无需手动写 `shouldComponentUpdate` 函数了。
+
+**Transaction**
+
+细粒度带来的另外一个问题：
+
+``` tsx
+class TodoItemModel {
+    @observable title;
+    @observable completed;
+    ......
+    reset() {
+        this.completed = false; // 触发重新渲染
+        this.title= ''; // 再次触发重新渲染
+    }
+    ......
+}
+```
+
+使用 transaction 解决：
+
+```tsx
+class TodoItemModel {
+    @observable title;
+    @observable completed;
+    ......
+    reset() {
+        transaction(()=>{
+            this.completed = false;
+            this.title= '';
+        }) // 只渲染一次
+    }
+    ......
+}
+```
+
+
+
+核心章节：[MobX 会对什么作出反应?](https://cn.mobx.js.org/best/react.html)
 
 
 
 ## Typescript
+
+**TypeScript = Javascript + 静态类型**
+
+Typescript 的优势：
+
+- 类型检查
+- 代码提示
+
+缺点：
+
+- 习惯动态类型的程序员，上手难度略高，特别是和`MobX`结合时。
+
+例子：
+
+```tsx
+// mobx store
+class ExampleStore extends Component {
+  @observable val:number = 0
+}
+export default new ExampleStore()
+// component
+@inject('ExampleStore')
+class ExampleComponent extends Component {
+  render () {
+		<Text>
+    	{this.props.ExampleStore.val} // tsc: this.props 上没有 ExampleStore 这个属性
+    </Text>
+  }
+}
+
+// 添加props声明
+interface IProps {
+	ExampleStore: any // store的类型是什么？	
+}
+
+// 父级组件
+class ExampleFatherComponent extends Components {
+	render () {
+		<ExampleComponent /> // tsc: props 中缺少了 ExampleStore
+  }
+}
+
+// props修改
+interface IProps {
+	ExampleStore?: any // 如果给 ExampleStore 加上问号呢？子组件引用属性时会提示可能为 undefined
+}
+```
+
+最后参考了别人的项目：
+
+```tsx
+// mobx store
+interface ExampleStoreInterface {
+	val: number
+}
+
+class ExampleStore implements ExampleStoreInterface {
+  @observable val:number = 0
+}
+export default new ExampleStore()
+
+// component
+interface IProps {
+	// ...除 store 外的 props
+}
+
+interface InjectProps {
+	ExampleStore: ExampleStoreInterface
+}
+
+@inject('ExampleStore')
+class ExampleComponent extends Component<IProps> {
+  get inject () {
+		return this.props as injectProps
+  }
+  
+  render () {
+		<Text>
+    	{this.props.ExampleStore.val} // tsc: this.props 上没有 ExampleStore 这个属性
+    </Text>
+  }
+}
+```
+
+**在大部分情况下，认真阅读 tsc 的报错就能解决问题。**
+
+
+
+# Taro 跨端开发方案
+
+[《为何我们要用 React 来写小程序 - Taro 诞生记》](https://aotu.io/notes/2018/06/25/the-birth-of-taro/index.html)
+
+## 核心：抹平平台差异
+
+输入一份源代码，针对不同的端设定好对应的转换规则，再一键转换出对应端的代码。
+
+![img](http://img11.360buyimg.com/img/jfs/t23863/65/477773801/39493/d1292897/5b307974Na1febb30.jpg)
+
+实际要做的不仅仅是这些，因为不同端会有自己的原生组件，端能力 API 等等，代码直接转换过去后，可能不能直接执行。例如，小程序中普通的容器组件用的是 `<view />`，而在 H5 中则是 `<div />`；小程序中提供了丰富的端能力 API，例如网络请求、文件下载、数据缓存等，而在 H5 中对应功能的 API 则不一致。
+
+为了弥补不同端的差异，我们需要订制好一个统一的组件库标准，以及统一的 API 标准，在不同的端依靠它们的语法与能力去实现这个组件库与 API，同时还要为不同的端编写相应的运行时框架，负责初始化等等操作。
+
+![img](http://img14.360buyimg.com/img/jfs/t21535/241/1645070830/74027/775c8a15/5b307976Nce466138.jpg)
+
+
+
+## 限制
+
+> 在 Taro 最初的设计中，我们组件库与 API 的标准就是源自小程序的，因为我们觉得既然已经有定义好的组件库与 API 标准，那为啥不直接拿来使用呢，这样不仅省去了定制标准的冥思苦想，同时也省去了为小程序开发组件库与 API 的麻烦，只需要**让其他端来向小程序靠齐**就好。
+>
+> 例子：[Image 组件](https://nervjs.github.io/taro/docs/components/media/image.html)
+
+不同端的能力有所差异，在抹平平台差异的过程中，必然会受到**短板效应**的限制。
+
+- 对齐短板（如[样式](https://nervjs.github.io/taro/docs/before-dev-remind.html)）
+- 放弃兼容
+- 条件编译
+
+假如有一个 `Test` 组件存在微信小程序、百度小程序和 H5 三个不同版本，那么就可以像如下组织代码
+
+`test.js` 文件，这是 `Test` 组件默认的形式，编译到微信小程序、百度小程序和 H5 三端之外的端使用的版本
+
+`test.h5.js` 文件，这是 `Test` 组件的 H5 版本
+
+`test.weapp.js` 文件，这是 `Test` 组件的 微信小程序 版本
+
+`test.swan.js` 文件，这是 `Test` 组件的 百度小程序 版本
+
+`test.qq.js` 文件，这是 `Test` 组件的 QQ 小程序 版本
+
+`test.quickapp.js` 文件，这是 `Test` 组件的 快应用 版本
+
+四个文件，对外暴露的是**统一的接口**，它们接受一致的参数，只是内部有针对各自平台的代码实现
+
+而我们使用 `Test` 组件的时候，引用的方式依然和之前保持一致，`import` 的是不带端类型的文件名，在编译的时候会自动识别并添加端类型后缀。
