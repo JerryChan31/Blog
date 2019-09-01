@@ -6,6 +6,8 @@
 
 ### 对于不了解 Taro 的朋友
 
+> 引用自《[Taro 介绍](https://nervjs.github.io/taro/docs/README.html)》
+
 **Taro** 是一套遵循 [React](https://reactjs.org/) 语法规范的 **多端开发** 解决方案。现如今市面上端的形态多种多样，Web、React-Native、微信小程序等各种端大行其道，当业务要求同时在不同的端都要求有所表现的时候，针对不同的端去编写多套代码的成本显然非常高，这时候只编写一套代码就能够适配到多端的能力就显得极为需要。
 
 使用 **Taro**，我们可以只书写一套代码，再通过 **Taro** 的编译工具，将源代码分别编译出可以在不同端（微信/百度/支付宝/字节跳动/QQ小程序、快应用、H5、React-Native 等）运行的代码。
@@ -28,7 +30,7 @@
 > - **数据更新方式**：在 React 中，组件的内部数据是用 `state` 来进行管理的，而在小程序中组件的内部数据都是用 `data` 来进行管理，两者具有一定相似性。而同时在 React 中，我们更新数据使用的是 `setState` 方法，传入新的数据或者生成新数据的函数，从而更新相应视图。在小程序中，则对应的有 `setData` 方法，传入新的数据，从而更新视图。
 > - **事件绑定**：小程序中绑定事件使用的是 `bind + 事件名` 的方式，React 里，则是 `on + 事件名` 的方式。
 >
-> 差异：
+> 差异&解决办法：
 >
 > - **模版**：小程序使用模版字符串，React 使用 JSX。 （ Taro 的做法：使用`babel` 的核心编译器`babylon`构造 AST，对 AST 进行转换操作，得出需要的新 AST，再将新 AST 进行递归遍历，生成小程序的模板。通过穷举的方式，将常用的、React 官方推荐的写法作为转换规则加以支持，而一些比较生僻的，或者是不那么推荐的写的写法则不做支持，转而以 `eslint` 插件的方式，提示用户进行修改。）
 
@@ -36,13 +38,13 @@
 
 ### 组件、props 与 state
 
-Vue: 单文件组件，props与data
+Vue: 单文件组件，props 与。data
 
-React: 基于 ES6 class 的组件
+React: 基于 ES6 class 的组件，props 与 state
 
 ```React
 class Clock extends React.Component {
-  constructor(props) { // 一般在构造函数中初始化 state
+  constructor(props) { // 一般在构造函数中初始化 state，对应 Vue 中的 data
     super(props);
     this.state = {date: new Date()};
   }
@@ -106,8 +108,6 @@ class Clock extends React.Component {
 ### 组合 VS 继承
 
 > 在 Facebook，我们在成百上千个组件中使用 React。我们并没有发现需要使用继承来构建组件层次的情况。
-
-个人尝试：BaseCard - PicCard - VoteCard
 
 ## JSX
 
@@ -177,7 +177,11 @@ JSX : `&&`和 `? :`
 
 
 ```jsx
-// Example 1
+// 实现展示图片的卡片，逻辑：
+// 1. 卡片包含 3 张或以上图片，只展示 3 张图片
+// 2. 卡片包含 1 或 2 张图片，只展示 1 张图片
+
+// Example 1： 在render()函数前做好判断，在JSX中只需写要渲染的元素名
 render () {
   const card = this.props.card
   const length:number = card.length
@@ -196,7 +200,7 @@ render () {
   )
 }
 
-// Example 2
+// Example 2：在JSX中做判断
 render () {
   const card = this.props.card
   const length:number = card.img.length
@@ -302,7 +306,7 @@ class TodoItemModel {
 
 
 
-核心章节：[MobX 会对什么作出反应?](https://cn.mobx.js.org/best/react.html)
+理解 MobX 需要阅读的核心章节：[MobX 会对什么作出反应?](https://cn.mobx.js.org/best/react.html)
 
 
 
@@ -319,9 +323,10 @@ Typescript 的优势：
 
 - 习惯动态类型的程序员，上手难度略高，特别是和`MobX`结合时。
 
-例子：
+例子：一个俄罗斯套娃
 
 ```tsx
+// 最开始的写法
 // mobx store
 class ExampleStore extends Component {
   @observable val:number = 0
@@ -339,7 +344,7 @@ class ExampleComponent extends Component {
 
 // 添加props声明
 interface IProps {
-	ExampleStore: any // store的类型是什么？	
+	ExampleStore: any // 初学者迷惑：store的类型是什么？
 }
 
 // 父级组件
@@ -355,7 +360,7 @@ interface IProps {
 }
 ```
 
-最后参考了别人的项目：
+最后参考了别人的项目，总结的写法：
 
 ```tsx
 // mobx store
@@ -391,13 +396,13 @@ class ExampleComponent extends Component<IProps> {
 }
 ```
 
-**在大部分情况下，认真阅读 tsc 的报错就能解决问题。**
+**在大部分情况下，认真阅读 tsc 的报错就能解决ts报错问题。**
 
 
 
 # Taro 跨端开发方案
 
-[《为何我们要用 React 来写小程序 - Taro 诞生记》](https://aotu.io/notes/2018/06/25/the-birth-of-taro/index.html)
+> 总结自 [《为何我们要用 React 来写小程序 - Taro 诞生记》](https://aotu.io/notes/2018/06/25/the-birth-of-taro/index.html)
 
 ## 核心：抹平平台差异
 
@@ -417,13 +422,15 @@ class ExampleComponent extends Component<IProps> {
 
 > 在 Taro 最初的设计中，我们组件库与 API 的标准就是源自小程序的，因为我们觉得既然已经有定义好的组件库与 API 标准，那为啥不直接拿来使用呢，这样不仅省去了定制标准的冥思苦想，同时也省去了为小程序开发组件库与 API 的麻烦，只需要**让其他端来向小程序靠齐**就好。
 >
-> 例子：[Image 组件](https://nervjs.github.io/taro/docs/components/media/image.html)
+> 一个体现：[Image 组件](https://nervjs.github.io/taro/docs/components/media/image.html) 中还有未经解释的小程序 API —— `mode`属性
 
 不同端的能力有所差异，在抹平平台差异的过程中，必然会受到**短板效应**的限制。
 
 - 对齐短板（如[样式](https://nervjs.github.io/taro/docs/before-dev-remind.html)）
 - 放弃兼容
 - 条件编译
+
+### 组件的条件编译
 
 假如有一个 `Test` 组件存在微信小程序、百度小程序和 H5 三个不同版本，那么就可以像如下组织代码
 
@@ -442,3 +449,46 @@ class ExampleComponent extends Component<IProps> {
 四个文件，对外暴露的是**统一的接口**，它们接受一致的参数，只是内部有针对各自平台的代码实现
 
 而我们使用 `Test` 组件的时候，引用的方式依然和之前保持一致，`import` 的是不带端类型的文件名，在编译的时候会自动识别并添加端类型后缀。
+
+### 样式的条件编译
+
+指定平台保留：
+```
+/*  #ifdef  %PLATFORM%  */
+样式代码
+/*  #endif  */
+```
+
+指定平台剔除：
+
+```
+/*  #ifndef  %PLATFORM%  */
+样式代码
+/*  #endif  */
+```
+
+
+
+# 迅雷的 Taro 跨端开发实践
+
+手机迅雷客户端 Hybrid 开发方案：
+
+将 Build 后的 H5 代码打包后以本地文件的形式提供给客户端访问。
+
+
+
+优势：
+
+- 加载速度远超传统H5，在高端手机上达到近乎原生的体验
+- 降低了移植到小程序端的成本
+- 承担了客户端开发的工作，减轻了客户端开发负担，并且有热更新的开发体验。
+
+劣势：
+
+- 增加了客户端软件包的大小
+- 在性能较差的机型上的体验与原生仍有距离
+
+
+
+
+
